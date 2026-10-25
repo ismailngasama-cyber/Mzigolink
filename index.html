@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MzigoLink</title>
+  <meta name="theme-color" content="#16a34a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MzigoLink">
+  <style>
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, Arial, sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+  margin: 0;
+  padding: 16px;
+  max-width: 480px;
+  margin-inline: auto;
+}
+
+h1 { color: #16a34a; margin: 8px 0 4px; }
+h2 { margin: 24px 0 8px; }
+
+form {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+label { display: block; font-weight: 600; margin: 12px 0 6px; }
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+
+button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: #16a34a;
+  border: none;
+  border-radius: 10px;
+}
+
+.tangazo {
+  background: #fff;
+  border-left: 5px solid #16a34a;
+  padding: 12px 14px;
+  margin-top: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+.tangazo h3 { margin: 0 0 6px; }
+.tangazo p { margin: 4px 0; color: #334155; }
+
+.piga {
+  display: block;
+  margin-top: 10px;
+  padding: 12px;
+  text-align: center;
+  font-weight: 700;
+  color: #fff;
+  background: #16a34a;
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.wa {
+  background: #25d366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  padding: 0;
+  margin-top: 8px;
+  border-radius: 10px;
+}
+
+.chukua { background: #ea580c; margin-top: 8px; }
+
+#googleBtn {
+  background: #fff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+.onyo {
+  background: #fef3c7;
+  border-left: 5px solid #f59e0b;
+  color: #78350f;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+  </style>
+</head>
+<body>
+  <h1>MzigoLink</h1>
+
+  <div id="authBox">
+    <form id="authForm">
+      <label>Barua pepe</label>
+      <input id="email" type="email" placeholder="jina@mfano.com" required>
+
+      <label>Nenosiri (angalau herufi 6)</label>
+      <input id="password" type="password" placeholder="Nenosiri" required minlength="6">
+
+      <button type="submit" id="loginBtn">Ingia</button>
+      <button type="button" id="signupBtn">Jisajili (akaunti mpya)</button>
+      <button type="button" id="googleBtn">Ingia na Google</button>
+    </form>
+  </div>
+
+  <div id="userBox" style="display:none">
+    <p>Umeingia kama: <b id="userEmail"></b></p>
+    <button type="button" id="logoutBtn">Toka</button>
+  </div>
+
+  <p>Unganisha mizigo na magari kwa urahisi.</p>
+  <p class="onyo">⚠️ Tahadhari: Usilipe pesa kabla ya kuona gari na dereva. Hakikisha namba ya gari na leseni ya dereva.</p>
+
+  <div id="postBox" style="display:none">
+    <form id="postForm">
+      <label>Mizigo inatoka wapi?</label>
+      <input id="from" type="text" placeholder="Mfano: Dar es Salaam" required>
+
+      <label>Mizigo inapelekwa wapi?</label>
+      <input id="to" type="text" placeholder="Mfano: Dodoma" required>
+
+      <label>Maelezo ya mzigo</label>
+      <input id="details" type="text" placeholder="Mfano: Mifuko ya mchele" required>
+
+      <label>Namba ya simu</label>
+      <input id="phone" type="tel" placeholder="Namba yako ya simu" required>
+
+      <button type="submit">Chapisha tangazo</button>
+    </form>
+  </div>
+
+  <h2>Matangazo ya mizigo</h2>
+  <input id="tafuta" type="text" placeholder="Tafuta kazi kwa mji (mfano: Dar es Salaam)">
+  <div id="listings"></div>
+
+  <h2>🚚 Sajili Gari la Mizigo</h2>
+  <div id="vehicleBox" style="display:none">
+    <form id="vehicleForm">
+      <label>Jina la mmiliki</label>
+      <input id="owner" type="text" placeholder="Mfano: Juma Ali" required>
+
+      <label>Namba ya simu</label>
+      <input id="vphone" type="tel" placeholder="Namba ya simu" required>
+
+      <label>Aina ya gari</label>
+      <input id="vtype" type="text" placeholder="Mfano: Canter" required>
+
+      <label>Uwezo</label>
+      <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
+
+      <label>Eneo gari lilipo</label>
+      <input id="route" type="text" placeholder="Mfano: Dodoma" required>
+
+      <button type="submit">Sajili Gari</button>
+    </form>
+  </div>
+
+  <h2>Magari yanayopatikana</h2>
+  <div id="vehicles"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+const SUPABASE_URL = "https://expxsxfdgbjortbuyeaw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_EPia56Pq9MDPnkaidJOblg_gwBH7hNx";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---------- MATANGAZO YA MIZIGO ---------- */
+
+const form = document.getElementById("postForm");
+const listings = document.getElementById("listings");
+
+function waLink(simu, ujumbe) {
+  let n = simu.replace(/\D/g, "");
+  if (n.startsWith("0")) n = "255" + n.slice(1);
+  return "https://wa.me/" + n + "?text=" + encodeURIComponent(ujumbe);
+}
+
+const WA_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>';
+
+let currentUserId = null;
+
+function onyesha(t) {
+  const ad = document.createElement("div");
+  ad.className = "tangazo";
+
+  const h = document.createElement("h3");
+  h.textContent = t.details;
+
+  const p1 = document.createElement("p");
+  p1.textContent = "Mizigo inatoka: " + t.from_place;
+
+  const p2 = document.createElement("p");
+  p2.textContent = "Mizigo inapelekwa: " + t.to_place;
+
+  const p3 = document.createElement("a");
+  p3.href = "tel:" + t.phone;
+  p3.textContent = "📞 Piga simu: " + t.phone;
+  p3.className = "piga";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "✅ Mzigo umepata gari";
+  btn.className = "chukua";
+  btn.addEventListener("click", async function () {
+    if (!confirm("Funga tangazo hili? Mzigo umepata gari.")) return;
+
+    const { error } = await supabaseClient
+      .from("listings")
+      .update({ status: "imechukuliwa" })
+      .eq("id", t.id);
+
+    if (error) {
+      alert("Kosa: " + error.message);
+      return;
+    }
+    pakia();
+  });
+
+  const wa = document.createElement("a");
+  wa.href = waLink(t.phone, "Habari, nimeona tangazo lako la mzigo (" + t.details + ") kwenye MzigoLink.");
+  wa.target = "_blank";
+  wa.rel = "noopener";
+  wa.innerHTML = WA_ICON;
+  wa.setAttribute("aria-label", "WhatsApp");
+  wa.className = "piga wa";
+
+  ad.append(h, p1, p2, p3, wa);
+  if (currentUserId && t.user_id === currentUserId) {
+    ad.append(btn);
+  }
+
+  return ad;
+}
+
+async function pakia() {
+  const { data, error } = await supabaseClient
+    .from("listings")
+    .select("*")
+    .eq("status", "wazi")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Kosa la kupakia:", error);
+    return;
+  }
+  listings.innerHTML = "";
+  data.forEach(t => listings.appendChild(onyesha(t)));
+}
+
+form.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const { error } = await supabaseClient.from("listings").insert({
+    from_place: document.getElementById("from").value.trim(),
+    to_place: document.getElementById("to").value.trim(),
+    details: document.getElementById("details").value.trim(),
+    phone: document.getElementById("phone").value.trim()
+  });
+
+  if (error) {
+    console.error("Kosa la kuhifadhi:", error);
+    alert("Kosa: " + error.message);
+    return;
+  }
+
+  form.reset();
+  pakia();
+});
+
+pakia();
+
+/* ---------- KICHUJIO CHA KAZI ---------- */
+
+document.getElementById("tafuta").addEventListener("input", function () {
+  const neno = this.value.trim().toLowerCase();
+  document.querySelectorAll("#listings .tangazo").forEach(function (kadi) {
+    kadi.style.display = kadi.textContent.toLowerCase().includes(neno) ? "" : "none";
+  });
+});
+
+/* ---------- MAGARI ---------- */
+
+const vehicleForm = document.getElementById("vehicleForm");
+const vehiclesList = document.getElementById("vehicles");
+
+async function loadVehicles() {
+  const { data, error } = await supabaseClient
+    .from("vehicles")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    console.error("Tatizo la kusoma magari:", error.message);
+    return;
+  }
+
+  vehiclesList.replaceChildren();
+
+  data.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "tangazo";
+
+    const name = document.createElement("h3");
+    name.textContent = item.owner_name;
+
+    const type = document.createElement("p");
+    type.textContent = "Aina ya gari: " + item.vehicle_type;
+
+    const capacity = document.createElement("p");
+    capacity.textContent = "Uwezo: " + item.capacity;
+
+    const location = document.createElement("p");
+    location.textContent = "Eneo: " + item.location;
+
+    const call = document.createElement("a");
+    call.href = "tel:" + item.phone;
+    call.textContent = "📞 Piga simu: " + item.phone;
+    call.className = "piga";
+
+    const wa = document.createElement("a");
+    wa.href = waLink(item.phone, "Habari, nimeona gari lako (" + item.vehicle_type + ") kwenye MzigoLink. Nina mzigo wa kusafirisha.");
+    wa.target = "_blank";
+    wa.rel = "noopener";
+    wa.innerHTML = WA_ICON;
+    wa.setAttribute("aria-label", "WhatsApp");
+    wa.className = "piga wa";
+
+    card.append(name, type, capacity, location, call, wa);
+    vehiclesList.appendChild(card);
+  });
+}
+
+vehicleForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const { error } = await supabaseClient
+    .from("vehicles")
+    .insert([{
+      owner_name: document.getElementById("owner").value.trim(),
+      phone: document.getElementById("vphone").value.trim(),
+      vehicle_type: document.getElementById("vtype").value.trim(),
+      capacity: document.getElementById("capacity").value.trim(),
+      location: document.getElementById("route").value.trim()
+    }]);
+
+  if (error) {
+    alert("Gari halijasajiliwa: " + error.message);
+    return;
+  }
+
+  alert("Hongera! Gari limesajiliwa.");
+  vehicleForm.reset();
+  loadVehicles();
+});
+
+loadVehicles();
+
+/* ---------- LOGIN ---------- */
+
+const authBox = document.getElementById("authBox");
+const userBox = document.getElementById("userBox");
+
+function onyeshaHali(session) {
+  const ndani = !!session;
+  currentUserId = ndani ? session.user.id : null;
+  authBox.style.display = ndani ? "none" : "block";
+  userBox.style.display = ndani ? "block" : "none";
+  document.getElementById("postBox").style.display = ndani ? "block" : "none";
+  document.getElementById("vehicleBox").style.display = ndani ? "block" : "none";
+  if (ndani) {
+    document.getElementById("userEmail").textContent = session.user.email;
+  }
+  pakia();
+}
+
+document.getElementById("authForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("password").value
+  });
+  if (error) alert("Kosa: " + error.message);
+});
+
+document.getElementById("signupBtn").addEventListener("click", async function () {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  if (!email || password.length < 6) {
+    alert("Weka barua pepe na nenosiri la angalau herufi 6");
+    return;
+  }
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) alert("Kosa: " + error.message);
+  else alert("Akaunti imetengenezwa. Kama umeombwa, angalia barua pepe yako kuthibitisha.");
+});
+
+document.getElementById("googleBtn").addEventListener("click", async function () {
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin }
+  });
+  if (error) alert("Kosa: " + error.message);
+});
+
+document.getElementById("logoutBtn").addEventListener("click", function () {
+  supabaseClient.auth.signOut();
+});
+
+supabaseClient.auth.onAuthStateChange(function (event, session) {
+  onyeshaHali(session);
+});
+
+supabaseClient.auth.getSession().then(function (r) {
+  onyeshaHali(r.data.session);
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+  </script>
+</body>
+</html>
