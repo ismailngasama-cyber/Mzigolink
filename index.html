@@ -47,6 +47,7 @@ input, select {
 #chujaGari { margin-bottom: 12px; }
 .gari-kichwa { display: flex; align-items: center; gap: 12px; }
 .gari-kichwa h3 { margin: 0; }
+.gari-picha { width: 100%; max-height: 220px; object-fit: cover; border-radius: 12px; margin: 10px 0; }
 .gari-ikoni { font-size: 44px; line-height: 1; }
 
 button {
@@ -197,6 +198,9 @@ button {
         <option>Tipa</option>
         <option>Tangi</option>
       </select>
+
+      <label>Picha ya gari (si lazima)</label>
+      <input id="picha" type="file" accept="image/*">
 
       <label>Uwezo (tani)</label>
       <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
@@ -349,6 +353,24 @@ document.getElementById("tafuta").addEventListener("input", function () {
 const vehicleForm = document.getElementById("vehicleForm");
 const vehiclesList = document.getElementById("vehicles");
 
+function punguzaPicha(file, max) {
+  return new Promise(function (resolve, reject) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(function (b) { b ? resolve(b) : reject(new Error("Picha imeshindikana")); }, "image/jpeg", 0.8);
+    };
+    img.onerror = function () { reject(new Error("Picha haisomeki")); };
+    img.src = url;
+  });
+}
+
 const IKONI = {
   "Pickup": "🛻", "Canter": "🚚", "Fuso": "🚚", "Lori ndogo": "🚚",
   "Lori kubwa": "🚛", "Trela": "🚛", "Tipa": "🚛", "Friji": "🚚", "Nyingine": "🚚"
@@ -380,6 +402,15 @@ async function loadVehicles() {
     name.textContent = item.owner_name;
     head.append(ikoni, name);
 
+    let pic = null;
+    if (item.photo_url) {
+      pic = document.createElement("img");
+      pic.src = item.photo_url;
+      pic.alt = "Picha ya gari";
+      pic.loading = "lazy";
+      pic.className = "gari-picha";
+    }
+
     const type = document.createElement("p");
     type.textContent = "Aina ya gari: " + item.vehicle_type + (item.body_type ? " (" + item.body_type + ")" : "");
 
@@ -405,7 +436,7 @@ async function loadVehicles() {
     wa.setAttribute("aria-label", "WhatsApp");
     wa.className = "piga wa";
 
-    card.append(head, type, plate, capacity, location, call, wa);
+    card.append(head); if (pic) card.append(pic); card.append(type, plate, capacity, location, call, wa);
     card.dataset.aina = item.vehicle_type || "";
     vehiclesList.appendChild(card);
   });
@@ -423,9 +454,26 @@ document.getElementById("chujaGari").addEventListener("change", chujaMagari);
 vehicleForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
+  let photoUrl = null;
+  const faili = document.getElementById("picha").files[0];
+  if (faili) {
+    if (!currentUserId) { alert("Ingia kwanza"); return; }
+    try {
+      const blob = await punguzaPicha(faili, 900);
+      const njia = currentUserId + "/" + Date.now() + ".jpg";
+      const up = await supabaseClient.storage.from("magari").upload(njia, blob, { contentType: "image/jpeg" });
+      if (up.error) { alert("Picha haijapakiwa: " + up.error.message); return; }
+      photoUrl = supabaseClient.storage.from("magari").getPublicUrl(njia).data.publicUrl;
+    } catch (e) {
+      alert("Picha haijapakiwa: " + e.message);
+      return;
+    }
+  }
+
   const { error } = await supabaseClient
     .from("vehicles")
     .insert([{
+      photo_url: photoUrl,
       owner_name: document.getElementById("owner").value.trim(),
       phone: document.getElementById("vphone").value.trim(),
       vehicle_type: document.getElementById("vtype").value.trim(),
