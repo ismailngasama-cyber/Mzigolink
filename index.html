@@ -45,6 +45,9 @@ input, select {
   color: #0f172a;
 }
 #chujaGari { margin-bottom: 12px; }
+.gari-kichwa { display: flex; align-items: center; gap: 12px; }
+.gari-kichwa h3 { margin: 0; }
+.gari-ikoni { font-size: 44px; line-height: 1; }
 
 button {
   width: 100%;
@@ -185,7 +188,17 @@ button {
       <label>Namba ya gari</label>
       <input id="plate" type="text" placeholder="Mfano: T123 ABC" required>
 
-      <label>Uwezo</label>
+      <label>Aina ya mwili wa gari</label>
+      <select id="body" required>
+        <option value="">Chagua aina ya mwili</option>
+        <option>Wazi</option>
+        <option>Uliofunikwa</option>
+        <option>Friji</option>
+        <option>Tipa</option>
+        <option>Tangi</option>
+      </select>
+
+      <label>Uwezo (tani)</label>
       <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
 
       <label>Eneo gari lilipo</label>
@@ -336,6 +349,11 @@ document.getElementById("tafuta").addEventListener("input", function () {
 const vehicleForm = document.getElementById("vehicleForm");
 const vehiclesList = document.getElementById("vehicles");
 
+const IKONI = {
+  "Pickup": "🛻", "Canter": "🚚", "Fuso": "🚚", "Lori ndogo": "🚚",
+  "Lori kubwa": "🚛", "Trela": "🚛", "Tipa": "🚛", "Friji": "🚚", "Nyingine": "🚚"
+};
+
 async function loadVehicles() {
   const { data, error } = await supabaseClient
     .from("vehicles")
@@ -353,11 +371,17 @@ async function loadVehicles() {
     const card = document.createElement("div");
     card.className = "tangazo";
 
+    const head = document.createElement("div");
+    head.className = "gari-kichwa";
+    const ikoni = document.createElement("span");
+    ikoni.className = "gari-ikoni";
+    ikoni.textContent = IKONI[item.vehicle_type] || "🚚";
     const name = document.createElement("h3");
     name.textContent = item.owner_name;
+    head.append(ikoni, name);
 
     const type = document.createElement("p");
-    type.textContent = "Aina ya gari: " + item.vehicle_type;
+    type.textContent = "Aina ya gari: " + item.vehicle_type + (item.body_type ? " (" + item.body_type + ")" : "");
 
     const plate = document.createElement("p");
     plate.textContent = "Namba ya gari: " + (item.plate_number || "-");
@@ -381,7 +405,7 @@ async function loadVehicles() {
     wa.setAttribute("aria-label", "WhatsApp");
     wa.className = "piga wa";
 
-    card.append(name, type, plate, capacity, location, call, wa);
+    card.append(head, type, plate, capacity, location, call, wa);
     card.dataset.aina = item.vehicle_type || "";
     vehiclesList.appendChild(card);
   });
@@ -405,6 +429,7 @@ vehicleForm.addEventListener("submit", async function (event) {
       owner_name: document.getElementById("owner").value.trim(),
       phone: document.getElementById("vphone").value.trim(),
       vehicle_type: document.getElementById("vtype").value.trim(),
+      body_type: document.getElementById("body").value.trim(),
       plate_number: document.getElementById("plate").value.trim().toUpperCase(),
       capacity: document.getElementById("capacity").value.trim(),
       location: document.getElementById("route").value.trim()
