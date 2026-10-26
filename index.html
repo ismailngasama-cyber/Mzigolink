@@ -35,13 +35,16 @@ form {
 
 label { display: block; font-weight: 600; margin: 12px 0 6px; }
 
-input {
+input, select {
   width: 100%;
   padding: 12px;
   font-size: 16px;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
 }
+#chujaGari { margin-bottom: 12px; }
 
 button {
   width: 100%;
@@ -166,7 +169,21 @@ button {
       <input id="vphone" type="tel" placeholder="Namba ya simu" required>
 
       <label>Aina ya gari</label>
-      <input id="vtype" type="text" placeholder="Mfano: Canter" required>
+      <select id="vtype" required>
+        <option value="">Chagua aina ya gari</option>
+        <option>Pickup</option>
+        <option>Canter</option>
+        <option>Fuso</option>
+        <option>Lori ndogo</option>
+        <option>Lori kubwa</option>
+        <option>Trela</option>
+        <option>Tipa</option>
+        <option>Friji</option>
+        <option>Nyingine</option>
+      </select>
+
+      <label>Namba ya gari</label>
+      <input id="plate" type="text" placeholder="Mfano: T123 ABC" required>
 
       <label>Uwezo</label>
       <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
@@ -179,6 +196,18 @@ button {
   </div>
 
   <h2>Magari yanayopatikana</h2>
+  <select id="chujaGari">
+    <option value="">Aina zote za magari</option>
+    <option>Pickup</option>
+    <option>Canter</option>
+    <option>Fuso</option>
+    <option>Lori ndogo</option>
+    <option>Lori kubwa</option>
+    <option>Trela</option>
+    <option>Tipa</option>
+    <option>Friji</option>
+    <option>Nyingine</option>
+  </select>
   <div id="vehicles"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -330,6 +359,9 @@ async function loadVehicles() {
     const type = document.createElement("p");
     type.textContent = "Aina ya gari: " + item.vehicle_type;
 
+    const plate = document.createElement("p");
+    plate.textContent = "Namba ya gari: " + (item.plate_number || "-");
+
     const capacity = document.createElement("p");
     capacity.textContent = "Uwezo: " + item.capacity;
 
@@ -349,10 +381,20 @@ async function loadVehicles() {
     wa.setAttribute("aria-label", "WhatsApp");
     wa.className = "piga wa";
 
-    card.append(name, type, capacity, location, call, wa);
+    card.append(name, type, plate, capacity, location, call, wa);
+    card.dataset.aina = item.vehicle_type || "";
     vehiclesList.appendChild(card);
   });
+  chujaMagari();
 }
+
+function chujaMagari() {
+  const aina = document.getElementById("chujaGari").value;
+  document.querySelectorAll("#vehicles .tangazo").forEach(function (k) {
+    k.style.display = (!aina || k.dataset.aina === aina) ? "" : "none";
+  });
+}
+document.getElementById("chujaGari").addEventListener("change", chujaMagari);
 
 vehicleForm.addEventListener("submit", async function (event) {
   event.preventDefault();
@@ -363,6 +405,7 @@ vehicleForm.addEventListener("submit", async function (event) {
       owner_name: document.getElementById("owner").value.trim(),
       phone: document.getElementById("vphone").value.trim(),
       vehicle_type: document.getElementById("vtype").value.trim(),
+      plate_number: document.getElementById("plate").value.trim().toUpperCase(),
       capacity: document.getElementById("capacity").value.trim(),
       location: document.getElementById("route").value.trim()
     }]);
