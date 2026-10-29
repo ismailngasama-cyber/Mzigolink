@@ -44,11 +44,22 @@ input, select {
   background: #fff;
   color: #0f172a;
 }
-#chujaGari { margin-bottom: 12px; }
+#chujaGari, #chujaEneo { margin-bottom: 12px; }
 .gari-kichwa { display: flex; align-items: center; gap: 12px; }
 .gari-kichwa h3 { margin: 0; }
 .gari-picha { width: 100%; max-height: 220px; object-fit: cover; border-radius: 12px; margin: 10px 0; }
 .thibitishwa { margin-left: auto; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.nauli-box { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 8px; }
+.nauli-jibu { margin-top: 14px; background: #dcfce7; border-radius: 12px; padding: 14px; color: #14532d; }
+.nauli-jibu strong { display: block; font-size: 24px; margin: 4px 0; }
+.hali-tabs { display: flex; gap: 8px; margin: 4px 0 8px; }
+.hali-tabs .tab { margin-top: 0; padding: 10px; font-size: 15px; background: #e2e8f0; color: #334155; }
+.hali-tabs .tab.on { background: #16a34a; color: #fff; }
+.mipangilio { margin-top: 14px; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; background: #f8fafc; }
+.mipangilio summary { font-weight: 700; cursor: pointer; }
+.nauli-jibu .mstari { display: flex; justify-content: space-between; gap: 10px; margin: 4px 0; font-size: 15px; }
+.nauli-jibu .mwongozo { margin-top: 10px; padding-top: 8px; border-top: 1px solid #86efac; font-size: 14px; }
+.nauli-dokezo { font-size: 13px; color: #64748b; margin: 10px 0 0; }
 .gari-ikoni { font-size: 44px; line-height: 1; }
 
 button {
@@ -115,12 +126,41 @@ button {
   border-radius: 10px;
   font-size: 14px;
 }
+  
+.bolt-top{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}
+.bolt-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;color:#16a34a}
+.bolt-logo i{background:#16a34a;color:#fff;border-radius:9px;width:30px;height:30px;display:grid;place-items:center;font-style:normal;font-size:17px}
+.omba{background:#fff;border-radius:24px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.12);margin-bottom:8px}
+.omba h2{margin:0 0 10px;font-size:22px}
+.omba .njia{background:#f1f5f9;border-radius:16px;padding:4px 12px;margin-bottom:12px}
+.omba .mstari{display:flex;align-items:center;gap:12px;padding:6px 0}
+.omba .mstari+.mstari{border-top:1px solid #e2e8f0}
+.omba .mstari select{border:none;background:transparent;padding:8px 0;font-weight:700;font-size:16px}
+.omba .nukta{width:12px;height:12px;border-radius:50%;background:#16a34a;flex:none}
+.omba .mraba{width:12px;height:12px;background:#0f172a;flex:none}
+.chaguo-gari{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;border:2px solid transparent;margin-bottom:4px;cursor:pointer}
+.chaguo-gari.on{border-color:#16a34a;background:#f0fdf4}
+.chaguo-gari .e{font-size:32px;width:44px;text-align:center}
+.chaguo-gari b{font-size:16px}.chaguo-gari small{display:block;color:#64748b;font-size:12px;margin-top:2px}
+.omba .kubwa{margin-top:10px;padding:16px;font-size:17px;border-radius:16px;box-shadow:0 8px 18px rgba(22,163,74,.35)}
+.omba-idadi{text-align:center;color:#64748b;font-size:13px;margin-top:8px}
   </style>
 </head>
 <body>
-  <h1>MzigoLink</h1>
+  <div class="bolt-top"><div class="bolt-logo"><i>M</i>MzigoLink</div></div>
 
-  <div id="authBox">
+  <div class="omba">
+    <h2>Unasafirisha mzigo wapi?</h2>
+    <div class="njia">
+      <div class="mstari"><span class="nukta"></span><select id="bFrom"></select></div>
+      <div class="mstari"><span class="mraba"></span><select id="bTo"></select></div>
+    </div>
+    <div id="bGari"></div>
+    <button type="button" id="bTafuta" class="kubwa">Tafuta gari</button>
+    <div class="omba-idadi" id="bIdadi"></div>
+  </div>
+
+  <div id="authBox" style="display:none">
     <form id="authForm">
       <label>Barua pepe</label>
       <input id="email" type="email" placeholder="jina@mfano.com" required>
@@ -145,10 +185,12 @@ button {
   <div id="postBox" style="display:none">
     <form id="postForm">
       <label>Mizigo inatoka wapi?</label>
-      <input id="from" type="text" placeholder="Mfano: Dar es Salaam" required>
+      <select id="fromSel"></select>
+      <input id="from" type="text" placeholder="Andika mji au eneo" style="display:none">
 
       <label>Mizigo inapelekwa wapi?</label>
-      <input id="to" type="text" placeholder="Mfano: Dodoma" required>
+      <select id="toSel"></select>
+      <input id="to" type="text" placeholder="Andika mji au eneo" style="display:none">
 
       <label>Maelezo ya mzigo</label>
       <input id="details" type="text" placeholder="Mfano: Mifuko ya mchele" required>
@@ -158,6 +200,72 @@ button {
 
       <button type="submit">Chapisha tangazo</button>
     </form>
+  </div>
+
+  <!-- Kikokotoo cha nauli: kimefichwa kwa sasa (kinarudishwa baadaye) -->
+  <h2 style="display:none">💰 Kadiria nauli</h2>
+  <div class="nauli-box" style="display:none">
+    <div class="hali-tabs" style="display:none"><!-- Ndani ya Dar: imesitishwa kwa sasa -->
+      <button type="button" id="tabMikoa" class="tab on">Mikoani</button>
+      <button type="button" id="tabMji" class="tab">Ndani ya Dar</button>
+    </div>
+
+    <label>Mzigo unatoka</label>
+    <select id="nFrom"></select>
+    <label>Mzigo unakwenda</label>
+    <select id="nTo"></select>
+    <label>Aina ya gari</label>
+    <select id="nType">
+      <option>Pickup</option>
+      <option>Canter</option>
+      <option selected>Fuso</option>
+      <option>Lori ndogo</option>
+      <option>Lori kubwa</option>
+      <option>Trela</option>
+      <option>Tipa</option>
+      <option>Friji</option>
+      <option>Nyingine</option>
+    </select>
+    <label>Faida unayotaka (%)</label>
+    <select id="nFaida">
+      <option>15</option><option>20</option><option selected>30</option><option>40</option><option>50</option>
+    </select>
+
+    <div class="only-mikoa">
+      <label>Tani za mzigo</label>
+      <input id="nTani" type="number" min="0.5" step="0.5" inputmode="decimal">
+    </div>
+    <div class="only-mji" style="display:none">
+      <label>Idadi ya wapakiaji</label>
+      <input id="nWapakiaji" type="number" min="0" step="1" value="2" inputmode="numeric">
+    </div>
+
+    <details class="mipangilio">
+      <summary>Mipangilio ya gharama (unaweza kubadilisha)</summary>
+      <label>Bei ya dizeli (Tsh kwa lita)</label>
+      <input id="nDizeli" type="number" min="0" step="10" value="4086" inputmode="numeric">
+      <label>Mafuta kwenda (lita kwa km)</label>
+      <input id="nLKwenda" type="number" min="0" step="0.01" inputmode="decimal">
+      <label>Mafuta kurudi (lita kwa km)</label>
+      <input id="nLKurudi" type="number" min="0" step="0.01" inputmode="decimal">
+      <div class="only-mikoa">
+        <label>Posho ya dereva kwa siku (Tsh)</label>
+        <input id="nPosho" type="number" min="0" step="1000" value="50000" inputmode="numeric">
+        <label>Km gari linazotembea kwa siku</label>
+        <input id="nKmSiku" type="number" min="50" step="10" value="500" inputmode="numeric">
+      </div>
+      <div class="only-mji" style="display:none">
+        <label>Malipo ya dereva kwa safari (Tsh)</label>
+        <input id="nDerevaMji" type="number" min="0" step="1000" value="30000" inputmode="numeric">
+        <label>Malipo kwa kila mpakiaji (Tsh)</label>
+        <input id="nMpakiaji" type="number" min="0" step="1000" value="10000" inputmode="numeric">
+      </div>
+      <label>Gharama nyingine (ushuru, chakula, n.k.) (Tsh)</label>
+      <input id="nNyingine" type="number" min="0" step="1000" value="0" inputmode="numeric">
+    </details>
+
+    <div id="nResult" class="nauli-jibu" style="display:none"></div>
+    <p class="nauli-dokezo">Hii ni makadirio tu. Bei halisi inategemea mzigo, barabara, mafuta na makubaliano na dereva.</p>
   </div>
 
   <h2>Matangazo ya mizigo</h2>
@@ -207,7 +315,8 @@ button {
       <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
 
       <label>Eneo gari lilipo</label>
-      <input id="route" type="text" placeholder="Mfano: Dodoma" required>
+      <select id="routeSel"></select>
+      <input id="route" type="text" placeholder="Andika mji au eneo" style="display:none">
 
       <button type="submit">Sajili Gari</button>
     </form>
@@ -226,6 +335,7 @@ button {
     <option>Friji</option>
     <option>Nyingine</option>
   </select>
+  <select id="chujaEneo"></select>
   <div id="vehicles"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -239,6 +349,50 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const form = document.getElementById("postForm");
 const listings = document.getElementById("listings");
+
+/* ---------- MAENEO YA DAR (orodha ya kuchagua) ---------- */
+const MAENEO_DAR = [
+  "Dar es Salaam (popote)", "Posta", "Kariakoo", "Kivukoni", "Kurasini", "Kigamboni", "Temeke", "Tandika",
+  "Mbagala", "Buguruni", "Ilala", "Gongo la Mboto", "Ukonga", "Chanika", "Segerea", "Tabata",
+  "Manzese", "Ubungo", "Sinza", "Magomeni", "Kimara", "Mbezi Luis", "Mbezi Beach", "Mwenge",
+  "Mikocheni", "Mwananyamala", "Kinondoni", "Kawe", "Tegeta", "Bunju", "Kibaha", "Bagamoyo", "Kisarawe"
+];
+const MWINGINE = "__mwingine";
+
+function jazaChaguo(selId, inputId) {
+  const sel = document.getElementById(selId), inp = document.getElementById(inputId);
+  sel.innerHTML = "";
+  const o0 = new Option("Chagua eneo", ""); sel.add(o0);
+  MAENEO_DAR.forEach(function (m) { sel.add(new Option(m, m)); });
+  sel.add(new Option("Mji mwingine (andika)", MWINGINE));
+  sel.required = true;
+  sel.addEventListener("change", function () {
+    const ni = sel.value === MWINGINE;
+    inp.style.display = ni ? "" : "none";
+    inp.required = ni;
+    if (!ni) inp.value = "";
+  });
+}
+function thamaniMahali(selId, inputId) {
+  const sel = document.getElementById(selId);
+  return sel.value === MWINGINE ? document.getElementById(inputId).value.trim() : sel.value;
+}
+function onyeshaMahaliBaadaYaReset() {
+  [["fromSel", "from"], ["toSel", "to"], ["routeSel", "route"]].forEach(function (p) {
+    const inp = document.getElementById(p[1]);
+    if (inp) { inp.style.display = "none"; inp.required = false; }
+  });
+}
+jazaChaguo("fromSel", "from");
+jazaChaguo("toSel", "to");
+jazaChaguo("routeSel", "route");
+document.getElementById("postForm").addEventListener("reset", function () { setTimeout(onyeshaMahaliBaadaYaReset, 0); });
+document.getElementById("vehicleForm").addEventListener("reset", function () { setTimeout(onyeshaMahaliBaadaYaReset, 0); });
+(function () {
+  const e = document.getElementById("chujaEneo");
+  e.add(new Option("Maeneo yote", ""));
+  MAENEO_DAR.slice(1).forEach(function (m) { e.add(new Option(m, m)); });
+})();
 
 function waLink(simu, ujumbe) {
   let n = simu.replace(/\D/g, "");
@@ -320,10 +474,14 @@ async function pakia() {
 
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
+  if (!thamaniMahali("fromSel", "from") || !thamaniMahali("toSel", "to")) {
+    alert("Chagua au andika mahali mzigo unapotoka na unapokwenda.");
+    return;
+  }
 
   const { error } = await supabaseClient.from("listings").insert({
-    from_place: document.getElementById("from").value.trim(),
-    to_place: document.getElementById("to").value.trim(),
+    from_place: thamaniMahali("fromSel", "from"),
+    to_place: thamaniMahali("toSel", "to"),
     details: document.getElementById("details").value.trim(),
     phone: document.getElementById("phone").value.trim()
   });
@@ -446,6 +604,7 @@ async function loadVehicles() {
 
     card.append(head); if (pic) card.append(pic); card.append(type, plate, capacity, location, call, wa);
     card.dataset.aina = item.vehicle_type || "";
+    card.dataset.eneo = item.location || "";
     vehiclesList.appendChild(card);
   });
   chujaMagari();
@@ -453,11 +612,48 @@ async function loadVehicles() {
 
 function chujaMagari() {
   const aina = document.getElementById("chujaGari").value;
+  const eneo = document.getElementById("chujaEneo").value;
   document.querySelectorAll("#vehicles .tangazo").forEach(function (k) {
-    k.style.display = (!aina || k.dataset.aina === aina) ? "" : "none";
+    const sawaAina = !aina || k.dataset.aina === aina;
+    const sawaEneo = !eneo || k.dataset.eneo === eneo;
+    k.style.display = (sawaAina && sawaEneo) ? "" : "none";
   });
 }
 document.getElementById("chujaGari").addEventListener("change", chujaMagari);
+document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
+
+/* ---------- BOLT-STYLE: OMBA GARI ---------- */
+(function () {
+  const AINA = [["🛻","Pickup","Mizigo midogo · tani 1"],["🚚","Canter","Tani 3–4"],["🚛","Fuso","Tani 7–10"],["🏗️","Tipa","Mchanga, kokoto"],["❄️","Friji","Vyakula na dawa"]];
+  let chaguo = "Canter";
+  const wrap = document.getElementById("bGari");
+  function chora() {
+    wrap.innerHTML = "";
+    AINA.forEach(function (a) {
+      const d = document.createElement("div");
+      d.className = "chaguo-gari" + (a[1] === chaguo ? " on" : "");
+      d.innerHTML = '<span class="e">' + a[0] + '</span><div><b>' + a[1] + '</b><small>' + a[2] + '</small></div>';
+      d.onclick = function () { chaguo = a[1]; chora(); };
+      wrap.appendChild(d);
+    });
+  }
+  chora();
+  ["bFrom", "bTo"].forEach(function (id, i) {
+    const sel = document.getElementById(id);
+    sel.add(new Option(i ? "Unapeleka wapi?" : "Unachukua wapi?", ""));
+    MAENEO_DAR.forEach(function (m) { sel.add(new Option(m, m)); });
+  });
+  document.getElementById("bTafuta").onclick = function () {
+    const f = document.getElementById("bFrom").value;
+    document.getElementById("chujaGari").value = chaguo;
+    document.getElementById("chujaEneo").value = (f && f !== MAENEO_DAR[0]) ? f : "";
+    chujaMagari();
+    const n = Array.from(document.querySelectorAll("#vehicles > *")).filter(function (k) { return k.style.display !== "none"; }).length;
+    document.getElementById("bIdadi").textContent = n ? ("Magari " + n + " yamepatikana ⬇️") : "Hakuna " + chaguo + " eneo hilo bado. Jaribu eneo jingine.";
+    document.getElementById("vehicles").scrollIntoView({ behavior: "smooth" });
+  };
+})();
+
 
 vehicleForm.addEventListener("submit", async function (event) {
   event.preventDefault();
@@ -488,7 +684,7 @@ vehicleForm.addEventListener("submit", async function (event) {
       body_type: document.getElementById("body").value.trim(),
       plate_number: document.getElementById("plate").value.trim().toUpperCase(),
       capacity: document.getElementById("capacity").value.trim(),
-      location: document.getElementById("route").value.trim()
+      location: thamaniMahali("routeSel", "route")
     }]);
 
   if (error) {
@@ -502,6 +698,159 @@ vehicleForm.addEventListener("submit", async function (event) {
 });
 
 loadVehicles();
+
+/* ---------- KADIRIA NAULI (gharama + faida) ---------- */
+
+const MIJI = [
+  ["Dar es Salaam",-6.79,39.21],["Dodoma",-6.17,35.74],["Morogoro",-6.82,37.66],
+  ["Arusha",-3.37,36.68],["Moshi",-3.35,37.34],["Tanga",-5.07,39.10],
+  ["Mwanza",-2.52,32.90],["Mbeya",-8.90,33.46],["Iringa",-7.77,35.69],
+  ["Njombe",-9.34,34.77],["Songea",-10.68,35.65],["Mtwara",-10.27,40.18],
+  ["Lindi",-9.99,39.71],["Kigoma",-4.88,29.63],["Tabora",-5.02,32.80],
+  ["Singida",-4.82,34.74],["Shinyanga",-3.66,33.42],["Kahama",-3.84,32.60],
+  ["Musoma",-1.50,33.80],["Bukoba",-1.33,31.81],["Sumbawanga",-7.97,31.62],
+  ["Geita",-2.87,32.23],["Babati",-4.21,35.75],["Kibaha",-6.77,38.92]
+];
+const MITAA = [
+  ["Posta (Katikati ya Jiji)",-6.816,39.288],["Kariakoo",-6.819,39.274],["Kurasini",-6.844,39.298],
+  ["Kigamboni",-6.867,39.333],["Temeke",-6.867,39.250],["Mbagala",-6.900,39.270],
+  ["Buguruni",-6.830,39.250],["Ilala",-6.835,39.260],["Gongo la Mboto",-6.890,39.160],
+  ["Ukonga",-6.880,39.110],["Chanika",-6.950,39.100],["Segerea",-6.830,39.170],
+  ["Tabata",-6.820,39.200],["Ubungo",-6.794,39.218],["Sinza",-6.783,39.217],
+  ["Kimara",-6.790,39.157],["Mbezi Luis",-6.720,39.140],["Mbezi Beach",-6.717,39.217],
+  ["Mwenge",-6.769,39.238],["Mikocheni",-6.767,39.250],["Kinondoni",-6.780,39.260],
+  ["Kawe",-6.722,39.226],["Tegeta",-6.650,39.170],["Bunju",-6.593,39.174],["Kibaha",-6.770,38.920]
+];
+// tani, mafuta kwenda (lita/km), mafuta kurudi (lita/km). Lori kubwa/Trela ni viwango halisi; vingine ni makisio.
+const AINA = {
+  "Pickup": [1, 0.12, 0.09], "Canter": [4, 0.15, 0.11], "Fuso": [10, 0.25, 0.18],
+  "Lori ndogo": [7, 0.22, 0.16], "Lori kubwa": [32, 0.50, 0.35], "Trela": [32, 0.50, 0.35],
+  "Tipa": [15, 0.35, 0.25], "Friji": [10, 0.30, 0.22], "Nyingine": [5, 0.20, 0.15]
+};
+const FAKTA_MIKOA = 1.15;  // umbali wa barabara ukilinganisha na mstari wa moja kwa moja
+const FAKTA_MJI = 1.35;    // ndani ya jiji barabara huzunguka zaidi
+const MAFUTA_MJI = 1.4;    // foleni huongeza matumizi ya mafuta ndani ya jiji
+
+let hali = "mikoa";
+const $ = (id) => document.getElementById(id);
+
+function umbaliKm(a, b, fakta) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b[1] - a[1]) * rad, dLon = (b[2] - a[2]) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h)) * fakta;
+}
+function pamba(sel, orodha) {
+  const kale = sel.value;
+  sel.innerHTML = "";
+  orodha.forEach(function (m, i) {
+    const o = document.createElement("option");
+    o.value = i; o.textContent = m[0];
+    sel.appendChild(o);
+  });
+  if (kale && +kale < orodha.length) sel.value = kale;
+}
+function viwangoMsingi() {
+  const k = AINA[$("nType").value] || AINA["Nyingine"];
+  const m = hali === "mji" ? MAFUTA_MJI : 1;
+  $("nTani").value = k[0];
+  $("nLKwenda").value = Math.round(k[1] * m * 100) / 100;
+  $("nLKurudi").value = Math.round(k[2] * m * 100) / 100;
+}
+function onyeshaHaliNauli() {
+  document.querySelectorAll(".only-mikoa").forEach(function (e) { e.style.display = hali === "mikoa" ? "" : "none"; });
+  document.querySelectorAll(".only-mji").forEach(function (e) { e.style.display = hali === "mji" ? "" : "none"; });
+  $("tabMikoa").classList.toggle("on", hali === "mikoa");
+  $("tabMji").classList.toggle("on", hali === "mji");
+}
+function weka(hali2) {
+  hali = hali2;
+  const orodha = hali === "mji" ? MITAA : MIJI;
+  $("nFrom").innerHTML = ""; $("nTo").innerHTML = "";
+  pamba($("nFrom"), orodha); pamba($("nTo"), orodha);
+  if (hali === "mji") { $("nFrom").value = 3; $("nTo").value = 23; }   // Kigamboni -> Bunju
+  else { $("nFrom").value = 0; $("nTo").value = 1; }                    // Dar -> Dodoma
+  onyeshaHaliNauli();
+  viwangoMsingi();
+  kadiriaNauli();
+}
+const nambaYa = (id) => Math.max(0, parseFloat($(id).value) || 0);
+const fmt = (x) => Math.round(x).toLocaleString("en-US");
+const r10k = (x) => Math.round(x / 10000) * 10000;
+const r500 = (x) => Math.round(x / 500) * 500;
+
+function mstari(kichwa, thamani) {
+  const d = document.createElement("div"); d.className = "mstari";
+  const a = document.createElement("span"); a.textContent = kichwa;
+  const b = document.createElement("strong"); b.textContent = thamani; b.style.fontSize = "16px"; b.style.margin = "0";
+  d.append(a, b); return d;
+}
+
+function kadiriaNauli() {
+  const orodha = hali === "mji" ? MITAA : MIJI;
+  const a = orodha[+$("nFrom").value], b = orodha[+$("nTo").value];
+  const aina = $("nType").value;
+  const out = $("nResult");
+  out.style.display = "block"; out.innerHTML = "";
+  if (!a || !b || a === b) { out.textContent = "Chagua sehemu mbili tofauti."; return; }
+
+  const km = umbaliKm(a, b, hali === "mji" ? FAKTA_MJI : FAKTA_MIKOA);
+  const dizeli = nambaYa("nDizeli");
+  const mafuta = km * (nambaYa("nLKwenda") + nambaYa("nLKurudi")) * dizeli;
+  const nyingine = nambaYa("nNyingine");
+  let msingi, tani = 0, maelezo = [];
+
+  if (hali === "mikoa") {
+    const siku = Math.max(1, Math.ceil((2 * km) / Math.max(50, nambaYa("nKmSiku"))));
+    const posho = siku * nambaYa("nPosho");
+    msingi = mafuta + posho + nyingine;
+    tani = Math.max(0.5, nambaYa("nTani"));
+    maelezo = [["Mafuta (kwenda na kurudi)", "Tsh " + fmt(mafuta)], ["Posho ya dereva (siku " + siku + ")", "Tsh " + fmt(posho)]];
+  } else {
+    const wapakiaji = nambaYa("nWapakiaji") * nambaYa("nMpakiaji");
+    const dereva = nambaYa("nDerevaMji");
+    msingi = mafuta + dereva + wapakiaji + nyingine;
+    maelezo = [["Mafuta (kwenda na kurudi)", "Tsh " + fmt(mafuta)], ["Dereva", "Tsh " + fmt(dereva)], ["Wapakiaji", "Tsh " + fmt(wapakiaji)]];
+  }
+  if (nyingine > 0) maelezo.push(["Gharama nyingine", "Tsh " + fmt(nyingine)]);
+
+  const faida = nambaYa("nFaida");
+  const jumla = msingi * (1 + faida / 100);
+  const juu = msingi * 1.5, chini = msingi * 1.15;
+
+  const t1 = document.createElement("div");
+  t1.textContent = a[0] + " hadi " + b[0] + " (" + aina + "), umbali takriban km " + Math.round(km);
+  const t2 = document.createElement("strong");
+  t2.textContent = "Tsh " + fmt(r10k(jumla));
+  const t3 = document.createElement("div");
+  t3.textContent = "Bei ya safari nzima, faida " + faida + "%";
+  out.append(t1, t2, t3);
+  if (hali === "mikoa") {
+    const p = document.createElement("div"); p.className = "mstari";
+    p.append(Object.assign(document.createElement("span"), { textContent: "Kwa tani " + tani }),
+             Object.assign(document.createElement("strong"), { textContent: "Tsh " + fmt(r500(jumla / tani)) + " kwa tani" }));
+    p.lastChild.style.fontSize = "16px"; p.lastChild.style.margin = "0";
+    out.append(p);
+  }
+  const m = document.createElement("div"); m.className = "mwongozo";
+  const mh = document.createElement("div"); mh.textContent = "Gharama za msingi: Tsh " + fmt(r10k(msingi));
+  m.append(mh);
+  maelezo.forEach(function (x) { m.append(mstari(x[0], x[1])); });
+  const g = document.createElement("div"); g.style.marginTop = "8px";
+  g.textContent = "Mwongozo wa mazungumzo: anza Tsh " + fmt(r10k(juu)) + " (faida 50%), usishuke chini ya Tsh " + fmt(r10k(chini)) + " (faida 15%)."
+    + (hali === "mikoa" ? " Kwa tani: " + fmt(r500(juu / tani)) + " hadi " + fmt(r500(chini / tani)) + "." : "");
+  m.append(g);
+  out.append(m);
+}
+
+$("tabMikoa").addEventListener("click", function () { weka("mikoa"); });
+$("tabMji").addEventListener("click", function () { weka("mji"); });
+$("nType").addEventListener("change", function () { viwangoMsingi(); kadiriaNauli(); });
+["nFrom", "nTo", "nFaida", "nTani", "nWapakiaji", "nDizeli", "nLKwenda", "nLKurudi", "nPosho", "nKmSiku", "nDerevaMji", "nMpakiaji", "nNyingine"].forEach(function (id) {
+  $(id).addEventListener("input", kadiriaNauli);
+  $(id).addEventListener("change", kadiriaNauli);
+});
+weka("mikoa");
 
 /* ---------- LOGIN ---------- */
 
