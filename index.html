@@ -144,23 +144,47 @@ button {
 .chaguo-gari b{font-size:16px}.chaguo-gari small{display:block;color:#64748b;font-size:12px;margin-top:2px}
 .omba .kubwa{margin-top:10px;padding:16px;font-size:17px;border-radius:16px;box-shadow:0 8px 18px rgba(22,163,74,.35)}
 .omba-idadi{text-align:center;color:#64748b;font-size:13px;margin-top:8px}
+  
+.hatua-bar{display:flex;gap:6px;margin:4px 0 6px}
+.hatua-bar span{flex:1;height:5px;border-radius:3px;background:#e2e8f0}
+.hatua-bar span.on{background:#16a34a}
+.hatua-jina{color:#64748b;font-size:13px;margin:0 0 4px}
+.hatua{display:none}.hatua.on{display:block}
+.hatua h3{margin:6px 0 2px;font-size:20px}
+.hatua .sub{color:#64748b;font-size:14px;margin:0 0 6px}
+.v-kadi{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;border:2px solid #e2e8f0;margin-top:8px;cursor:pointer}
+.v-kadi.on{border-color:#16a34a;background:#f0fdf4}
+.v-kadi .e{font-size:30px;width:42px;text-align:center}.v-kadi b{display:block}.v-kadi small{color:#64748b}
+.nav-hatua{display:flex;gap:10px}
+.nav-hatua button{margin-top:16px}
+.nav-hatua .nyuma{background:#e2e8f0;color:#334155;flex:0 0 32%}
+.muhtasari{background:#f1f5f9;border-radius:14px;padding:12px;margin-top:12px;font-size:15px;line-height:1.7}
+.hali-box{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:700}
+.hali-box.subiri{background:#fef3c7;color:#78350f}
+.hali-box.sawa{background:#dcfce7;color:#14532d}
+.faili-kadi{margin-top:6px;border:2px dashed #cbd5e1;border-radius:14px;padding:10px;background:#f8fafc}
+.karibu{text-align:center;margin:18px 0 14px}
+.karibu-ikoni{font-size:60px;line-height:1}
+.karibu h2{margin:8px 0 4px;font-size:26px}
+.karibu p{color:#64748b;margin:0}
+
+.skrini{display:none}.skrini.on{display:block}
+body{padding-bottom:90px}
+.nav-chini{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#fff;display:flex;box-shadow:0 -4px 16px rgba(0,0,0,.1);border-radius:20px 20px 0 0;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:50}
+.nav-chini button{flex:1;margin:0;padding:6px 0;background:transparent;color:#64748b;font-size:12px;font-weight:700;border-radius:12px}
+.nav-chini button span{display:block;font-size:22px;line-height:1.2}
+.nav-chini button.on{color:#16a34a}
   </style>
 </head>
 <body>
   <div class="bolt-top"><div class="bolt-logo"><i>M</i>MzigoLink</div></div>
 
-  <div class="omba">
-    <h2>Unasafirisha mzigo wapi?</h2>
-    <div class="njia">
-      <div class="mstari"><span class="nukta"></span><select id="bFrom"></select></div>
-      <div class="mstari"><span class="mraba"></span><select id="bTo"></select></div>
-    </div>
-    <div id="bGari"></div>
-    <button type="button" id="bTafuta" class="kubwa">Tafuta gari</button>
-    <div class="omba-idadi" id="bIdadi"></div>
-  </div>
-
   <div id="authBox" style="display:none">
+    <div class="karibu">
+      <div class="karibu-ikoni">🚚</div>
+      <h2>Karibu MzigoLink</h2>
+      <p>Tafuta gari la mzigo wako Dar es Salaam, haraka na kwa urahisi.</p>
+    </div>
     <form id="authForm">
       <label>Barua pepe</label>
       <input id="email" type="email" placeholder="jina@mfano.com" required>
@@ -174,14 +198,42 @@ button {
     </form>
   </div>
 
-  <div id="userBox" style="display:none">
-    <p>Umeingia kama: <b id="userEmail"></b></p>
-    <button type="button" id="logoutBtn">Toka</button>
+  <div id="app" style="display:none">
+  <div class="skrini on" id="vNyumbani">
+  <div class="omba">
+    <h2>Unasafirisha mzigo wapi?</h2>
+    <div class="njia">
+      <div class="mstari"><span class="nukta"></span><select id="bFrom"></select></div>
+      <div class="mstari"><span class="mraba"></span><select id="bTo"></select></div>
+    </div>
+    <div id="bGari"></div>
+    <button type="button" id="bTafuta" class="kubwa">Tafuta gari</button>
+    <div class="omba-idadi" id="bIdadi"></div>
   </div>
 
-  <p>Unganisha mizigo na magari kwa urahisi.</p>
   <p class="onyo">⚠️ Tahadhari: Usilipe pesa kabla ya kuona gari na dereva. Hakikisha namba ya gari na leseni ya dereva.</p>
 
+  <div id="matokeo" style="display:none">
+  <h2>Magari yanayopatikana</h2>
+  <select id="chujaGari" style="display:none">
+    <option value="">Aina zote za magari</option>
+    <option>Pickup</option>
+    <option>Canter</option>
+    <option>Fuso</option>
+    <option>Lori ndogo</option>
+    <option>Lori kubwa</option>
+    <option>Trela</option>
+    <option>Tipa</option>
+    <option>Friji</option>
+    <option>Nyingine</option>
+  </select>
+  <select id="chujaEneo" style="display:none"></select>
+  <div id="vehicles"></div>
+
+  </div>
+  </div>
+
+  <div class="skrini" id="vMatangazo">
   <div id="postBox" style="display:none">
     <form id="postForm">
       <label>Mizigo inatoka wapi?</label>
@@ -272,71 +324,80 @@ button {
   <input id="tafuta" type="text" placeholder="Tafuta kazi kwa mji (mfano: Dar es Salaam)">
   <div id="listings"></div>
 
+  </div>
+
+  <div class="skrini" id="vDereva">
   <h2>🚚 Sajili Gari la Mizigo</h2>
   <div id="vehicleBox" style="display:none">
-    <form id="vehicleForm">
-      <label>Jina la mmiliki</label>
-      <input id="owner" type="text" placeholder="Mfano: Juma Ali" required>
+    <div id="haliYangu"></div>
+    <form id="vehicleForm" novalidate>
+      <div class="hatua-bar"><span class="on"></span><span></span><span></span></div>
+      <p class="hatua-jina" id="hatuaJina">Hatua 1 kati ya 3</p>
 
-      <label>Namba ya simu</label>
-      <input id="vphone" type="tel" placeholder="Namba ya simu" required>
+      <div class="hatua on" data-h="1">
+        <h3>Wewe</h3><p class="sub">Tuambie wewe ni nani.</p>
+        <label>Jina kamili</label>
+        <input id="owner" type="text" placeholder="Mfano: Juma Ali" autocomplete="name">
+        <label>Namba ya simu</label>
+        <input id="vphone" type="tel" placeholder="Mfano: 0712 345 678" autocomplete="tel">
+        <label>Eneo gari lilipo</label>
+        <select id="routeSel"></select>
+        <input id="route" type="text" placeholder="Andika mji au eneo" style="display:none">
+      </div>
 
-      <label>Aina ya gari</label>
-      <select id="vtype" required>
-        <option value="">Chagua aina ya gari</option>
-        <option>Pickup</option>
-        <option>Canter</option>
-        <option>Fuso</option>
-        <option>Lori ndogo</option>
-        <option>Lori kubwa</option>
-        <option>Trela</option>
-        <option>Tipa</option>
-        <option>Friji</option>
-        <option>Nyingine</option>
-      </select>
+      <div class="hatua" data-h="2">
+        <h3>Gari lako</h3><p class="sub">Chagua aina ya gari.</p>
+        <div id="vKadi"></div>
+        <select id="vtype" style="display:none"><option value=""></option><option>Pickup</option><option>Canter</option><option>Fuso</option><option>Lori ndogo</option><option>Lori kubwa</option><option>Trela</option><option>Tipa</option><option>Friji</option><option>Nyingine</option></select>
+        <label>Namba ya gari</label>
+        <input id="plate" type="text" placeholder="Mfano: T123 ABC" autocapitalize="characters">
+        <label>Aina ya mwili wa gari</label>
+        <select id="body">
+          <option value="">Chagua aina ya mwili</option>
+          <option>Wazi</option><option>Uliofunikwa</option><option>Friji</option><option>Tipa</option><option>Tangi</option>
+        </select>
+        <label>Uwezo (tani)</label>
+        <input id="capacity" type="text" placeholder="Mfano: Tani 3">
+        <label>Picha ya gari (si lazima)</label>
+        <input id="picha" type="file" accept="image/*">
+      </div>
 
-      <label>Namba ya gari</label>
-      <input id="plate" type="text" placeholder="Mfano: T123 ABC" required>
+      <div class="hatua" data-h="3">
+        <h3>Nyaraka</h3><p class="sub">Zinatumika kukuthibitisha tu. Hazionekani kwa watu wengine.</p>
+        <div class="faili-kadi"><label style="margin-top:0">📄 Picha ya leseni ya udereva (lazima)</label>
+        <input id="licha" type="file" accept="image/*"></div>
+        <div class="faili-kadi"><label style="margin-top:0">📄 Picha ya usajili wa gari (lazima)</label>
+        <input id="usajili" type="file" accept="image/*"></div>
+        <div class="muhtasari" id="muhtasari"></div>
+      </div>
 
-      <label>Aina ya mwili wa gari</label>
-      <select id="body" required>
-        <option value="">Chagua aina ya mwili</option>
-        <option>Wazi</option>
-        <option>Uliofunikwa</option>
-        <option>Friji</option>
-        <option>Tipa</option>
-        <option>Tangi</option>
-      </select>
-
-      <label>Picha ya gari (si lazima)</label>
-      <input id="picha" type="file" accept="image/*">
-
-      <label>Uwezo (tani)</label>
-      <input id="capacity" type="text" placeholder="Mfano: Tani 3" required>
-
-      <label>Eneo gari lilipo</label>
-      <select id="routeSel"></select>
-      <input id="route" type="text" placeholder="Andika mji au eneo" style="display:none">
-
-      <button type="submit">Sajili Gari</button>
+      <div class="nav-hatua">
+        <button type="button" class="nyuma" id="hNyuma" style="display:none">Rudi</button>
+        <button type="button" id="hMbele">Endelea</button>
+        <button type="submit" id="hTuma" style="display:none">Tuma kwa uhakiki</button>
+      </div>
     </form>
   </div>
 
-  <h2>Magari yanayopatikana</h2>
-  <select id="chujaGari">
-    <option value="">Aina zote za magari</option>
-    <option>Pickup</option>
-    <option>Canter</option>
-    <option>Fuso</option>
-    <option>Lori ndogo</option>
-    <option>Lori kubwa</option>
-    <option>Trela</option>
-    <option>Tipa</option>
-    <option>Friji</option>
-    <option>Nyingine</option>
-  </select>
-  <select id="chujaEneo"></select>
-  <div id="vehicles"></div>
+  </div>
+
+  <div class="skrini" id="vMimi">
+    <h2>Akaunti yangu</h2>
+  <div id="userBox" style="display:none">
+    <p>Umeingia kama: <b id="userEmail"></b></p>
+    <button type="button" id="logoutBtn">Toka</button>
+  </div>
+
+    <p><a href="privacy.html">Sera ya faragha</a></p>
+  </div>
+
+  <nav class="nav-chini" id="navChini">
+    <button type="button" data-v="vNyumbani" class="on"><span>🏠</span>Nyumbani</button>
+    <button type="button" data-v="vMatangazo"><span>📦</span>Mizigo</button>
+    <button type="button" data-v="vDereva"><span>🚚</span>Dereva</button>
+    <button type="button" data-v="vMimi"><span>👤</span>Mimi</button>
+  </nav>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
@@ -549,6 +610,19 @@ async function loadVehicles() {
 
   vehiclesList.replaceChildren();
 
+  const yangu = currentUserId ? data.filter(function (g) { return g.user_id === currentUserId; }) : [];
+  const hb = document.getElementById("haliYangu");
+  if (hb) {
+    hb.innerHTML = "";
+    yangu.forEach(function (g) {
+      const d = document.createElement("div");
+      const ok = !!g.verified;
+      d.className = "hali-box " + (ok ? "sawa" : "subiri");
+      d.textContent = (ok ? "✔ Imethibitishwa: " : "⏳ Inasubiri uhakiki: ") + g.vehicle_type + " " + (g.plate_number || "");
+      hb.appendChild(d);
+    });
+  }
+
   data.forEach((item) => {
     const card = document.createElement("div");
     card.className = "tangazo";
@@ -644,6 +718,7 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
     MAENEO_DAR.forEach(function (m) { sel.add(new Option(m, m)); });
   });
   document.getElementById("bTafuta").onclick = function () {
+    document.getElementById("matokeo").style.display = "block";
     const f = document.getElementById("bFrom").value;
     document.getElementById("chujaGari").value = chaguo;
     document.getElementById("chujaEneo").value = (f && f !== MAENEO_DAR[0]) ? f : "";
@@ -655,47 +730,123 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
 })();
 
 
-vehicleForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
+/* ---------- FOMU YA DEREVA: HATUA 3 ---------- */
+(function () {
+  const AINA_V = [["🛻","Pickup","Tani 1"],["🚚","Canter","Tani 3–4"],["🚚","Fuso","Tani 7–10"],["🚛","Lori ndogo","Tani 10–15"],["🚛","Lori kubwa","Tani 20+"],["🚛","Trela","Tani 30+"],["🏗️","Tipa","Mchanga, kokoto"],["❄️","Friji","Vyakula, dawa"],["🚚","Nyingine",""]];
+  const kadi = document.getElementById("vKadi"), sel = document.getElementById("vtype");
+  function chora() {
+    kadi.innerHTML = "";
+    AINA_V.forEach(function (a) {
+      const d = document.createElement("div");
+      d.className = "v-kadi" + (sel.value === a[1] ? " on" : "");
+      d.innerHTML = '<span class="e">' + a[0] + '</span><div><b>' + a[1] + '</b><small>' + a[2] + '</small></div>';
+      d.onclick = function () { sel.value = a[1]; chora(); };
+      kadi.appendChild(d);
+    });
+  }
+  chora();
 
-  let photoUrl = null;
-  const faili = document.getElementById("picha").files[0];
-  if (faili) {
-    if (!currentUserId) { alert("Ingia kwanza"); return; }
-    try {
-      const blob = await punguzaPicha(faili, 900);
-      const njia = currentUserId + "/" + Date.now() + ".jpg";
-      const up = await supabaseClient.storage.from("magari").upload(njia, blob, { contentType: "image/jpeg" });
-      if (up.error) { alert("Picha haijapakiwa: " + up.error.message); return; }
-      photoUrl = supabaseClient.storage.from("magari").getPublicUrl(njia).data.publicUrl;
-    } catch (e) {
-      alert("Picha haijapakiwa: " + e.message);
-      return;
+  let h = 1;
+  const bar = vehicleForm.querySelectorAll(".hatua-bar span");
+  function onyesha() {
+    vehicleForm.querySelectorAll(".hatua").forEach(function (x) { x.classList.toggle("on", +x.dataset.h === h); });
+    bar.forEach(function (x, i) { x.classList.toggle("on", i < h); });
+    document.getElementById("hatuaJina").textContent = "Hatua " + h + " kati ya 3";
+    document.getElementById("hNyuma").style.display = h > 1 ? "" : "none";
+    document.getElementById("hMbele").style.display = h < 3 ? "" : "none";
+    document.getElementById("hTuma").style.display = h === 3 ? "" : "none";
+    if (h === 3) {
+      document.getElementById("muhtasari").innerHTML = "<b>Angalia kabla ya kutuma</b><br>👤 " + esc($v("owner")) + " · " + esc($v("vphone")) + "<br>📍 " + esc(thamaniMahali("routeSel", "route")) + "<br>🚚 " + esc(sel.value) + " (" + esc($v("body")) + ") · " + esc($v("capacity")) + "<br>🔢 " + esc($v("plate").toUpperCase());
     }
+    vehicleForm.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function $v(id) { return document.getElementById(id).value.trim(); }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function kosa(n) {
+    if (n === 1) {
+      if (!$v("owner")) return "Andika jina lako";
+      if ($v("vphone").replace(/\D/g, "").length < 9) return "Andika namba ya simu sahihi";
+      if (!thamaniMahali("routeSel", "route")) return "Chagua eneo gari lilipo";
+    }
+    if (n === 2) {
+      if (!sel.value) return "Chagua aina ya gari";
+      if (!$v("plate")) return "Andika namba ya gari";
+      if (!$v("body")) return "Chagua aina ya mwili wa gari";
+      if (!$v("capacity")) return "Andika uwezo wa gari (tani)";
+    }
+    if (n === 3) {
+      if (!document.getElementById("licha").files[0]) return "Weka picha ya leseni ya udereva";
+      if (!document.getElementById("usajili").files[0]) return "Weka picha ya usajili wa gari";
+    }
+    return "";
+  }
+  document.getElementById("hMbele").onclick = function () {
+    const k = kosa(h); if (k) { alert(k); return; }
+    h++; onyesha();
+  };
+  document.getElementById("hNyuma").onclick = function () { h--; onyesha(); };
+
+  async function pakiaFaili(file, bucket, max) {
+    const blob = await punguzaPicha(file, max);
+    const njia = currentUserId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + ".jpg";
+    const up = await supabaseClient.storage.from(bucket).upload(njia, blob, { contentType: "image/jpeg" });
+    if (up.error) throw new Error(up.error.message);
+    return njia;
   }
 
-  const { error } = await supabaseClient
-    .from("vehicles")
-    .insert([{
-      photo_url: photoUrl,
-      owner_name: document.getElementById("owner").value.trim(),
-      phone: document.getElementById("vphone").value.trim(),
-      vehicle_type: document.getElementById("vtype").value.trim(),
-      body_type: document.getElementById("body").value.trim(),
-      plate_number: document.getElementById("plate").value.trim().toUpperCase(),
-      capacity: document.getElementById("capacity").value.trim(),
-      location: thamaniMahali("routeSel", "route")
-    }]);
+  vehicleForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    if (!currentUserId) { alert("Ingia kwanza"); return; }
+    for (let n = 1; n <= 3; n++) { const k = kosa(n); if (k) { alert(k); h = n; onyesha(); return; } }
+    const btn = document.getElementById("hTuma");
+    btn.disabled = true; btn.textContent = "Inatuma...";
+    try {
+      let photoUrl = null;
+      const f = document.getElementById("picha").files[0];
+      if (f) {
+        const njia = await pakiaFaili(f, "magari", 900);
+        photoUrl = supabaseClient.storage.from("magari").getPublicUrl(njia).data.publicUrl;
+      }
+      const lic = await pakiaFaili(document.getElementById("licha").files[0], "nyaraka", 1400);
+      const reg = await pakiaFaili(document.getElementById("usajili").files[0], "nyaraka", 1400);
+      const { error } = await supabaseClient.from("vehicles").insert([{
+        photo_url: photoUrl,
+        owner_name: $v("owner"),
+        phone: $v("vphone"),
+        vehicle_type: sel.value,
+        body_type: $v("body"),
+        plate_number: $v("plate").toUpperCase(),
+        capacity: $v("capacity"),
+        location: thamaniMahali("routeSel", "route"),
+        licence_path: lic,
+        reg_path: reg
+      }]);
+      if (error) throw new Error(error.message);
+      alert("Hongera! Gari limetumwa. Tutakuthibitisha hivi karibuni.");
+      vehicleForm.reset(); sel.value = ""; chora(); h = 1; onyesha();
+      loadVehicles();
+    } catch (e) {
+      alert("Gari halijasajiliwa: " + e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "Tuma kwa uhakiki";
+    }
+  });
+})();
 
-  if (error) {
-    alert("Gari halijasajiliwa: " + error.message);
-    return;
+/* ---------- TABO ZA CHINI ---------- */
+(function () {
+  const btns = document.querySelectorAll("#navChini button");
+  function nenda(id) {
+    document.querySelectorAll(".skrini").forEach(function (x) { x.classList.toggle("on", x.id === id); });
+    btns.forEach(function (b) { b.classList.toggle("on", b.dataset.v === id); });
+    window.scrollTo(0, 0);
   }
-
-  alert("Hongera! Gari limesajiliwa.");
-  vehicleForm.reset();
-  loadVehicles();
-});
+  btns.forEach(function (b) { b.addEventListener("click", function () { nenda(b.dataset.v); }); });
+  window.nendaSkrini = nenda;
+  document.getElementById("bTafuta").addEventListener("click", function () {
+    document.getElementById("matokeo").style.display = "block";
+  });
+})();
 
 loadVehicles();
 
@@ -861,6 +1012,7 @@ function onyeshaHali(session) {
   const ndani = !!session;
   currentUserId = ndani ? session.user.id : null;
   authBox.style.display = ndani ? "none" : "block";
+  document.getElementById("app").style.display = ndani ? "block" : "none";
   userBox.style.display = ndani ? "block" : "none";
   document.getElementById("postBox").style.display = ndani ? "block" : "none";
   document.getElementById("vehicleBox").style.display = ndani ? "block" : "none";
