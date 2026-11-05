@@ -174,6 +174,23 @@ body{padding-bottom:90px}
 .nav-chini button{flex:1;margin:0;padding:6px 0;background:transparent;color:#64748b;font-size:12px;font-weight:700;border-radius:12px}
 .nav-chini button span{display:block;font-size:22px;line-height:1.2}
 .nav-chini button.on{color:#16a34a}
+.mzigo-box{margin-top:6px}
+.mzigo-box label{margin:10px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 12px;border-radius:999px;border:2px solid #e2e8f0;font-size:14px;font-weight:600;cursor:pointer;background:#fff}
+.chip.on{border-color:#16a34a;background:#f0fdf4;color:#166534}
+.kiasi-row{display:flex;gap:8px;margin-top:8px}.kiasi-row input{flex:1.2}.kiasi-row select{flex:1}
+.ombi-kadi{background:#fff;border-radius:16px;padding:12px 14px;margin-top:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:5px solid #f59e0b}
+.ombi-kadi.sawa{border-left-color:#16a34a}.ombi-kadi.kataa{border-left-color:#94a3b8;opacity:.8}
+.ombi-kadi p{margin:3px 0}.ombi-kadi .j{font-weight:800;font-size:16px}
+.ombi-kadi .vitufe{display:flex;gap:8px}.ombi-kadi .vitufe button{margin-top:10px;padding:12px}
+.ombi-kadi .kataa-b{background:#e2e8f0;color:#334155}
+.ombi-kadi .piga{margin-top:8px}
+.chip-hali{display:inline-block;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:#fef3c7;color:#78350f}
+.chip-hali.sawa{background:#dcfce7;color:#166534}.chip-hali.kataa{background:#e2e8f0;color:#475569}
+.omba-btn{background:#ea580c}
+.nav-chini button{position:relative}
+.nav-chini button i{position:absolute;top:0;left:55%;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-style:normal;min-width:18px;height:18px;line-height:18px;padding:0 5px}
   </style>
 </head>
 <body>
@@ -207,10 +224,23 @@ body{padding-bottom:90px}
       <div class="mstari"><span class="mraba"></span><select id="bTo"></select></div>
     </div>
     <div id="bGari"></div>
+    <div class="mzigo-box">
+      <label>Mzigo wako ni nini?</label>
+      <div class="chips" id="mAina"></div>
+      <input id="mAinaNyingine" type="text" placeholder="Andika aina ya mzigo" style="display:none;margin-top:8px">
+      <label>Kiasi</label>
+      <div class="kiasi-row">
+        <input id="mKiasi" type="number" inputmode="decimal" min="0" step="any" placeholder="Mfano: 2">
+        <select id="mKipimo"><option>Tani</option><option>Kg</option><option>Mifuko</option><option>Vipande</option></select>
+      </div>
+      <label>Namba yako ya simu</label>
+      <input id="mSimu" type="tel" placeholder="Mfano: 0712 345 678" autocomplete="tel">
+    </div>
     <button type="button" id="bTafuta" class="kubwa">Tafuta gari</button>
     <div class="omba-idadi" id="bIdadi"></div>
   </div>
 
+  <div id="maombiYangu"></div>
   <p class="onyo">⚠️ Tahadhari: Usilipe pesa kabla ya kuona gari na dereva. Hakikisha namba ya gari na leseni ya dereva.</p>
 
   <div id="matokeo" style="display:none">
@@ -327,6 +357,7 @@ body{padding-bottom:90px}
   </div>
 
   <div class="skrini" id="vDereva">
+    <div id="maombiDereva"></div>
   <h2>🚚 Sajili Gari la Mizigo</h2>
   <div id="vehicleBox" style="display:none">
     <div id="haliYangu"></div>
@@ -394,7 +425,7 @@ body{padding-bottom:90px}
   <nav class="nav-chini" id="navChini">
     <button type="button" data-v="vNyumbani" class="on"><span>🏠</span>Nyumbani</button>
     <button type="button" data-v="vMatangazo"><span>📦</span>Mizigo</button>
-    <button type="button" data-v="vDereva"><span>🚚</span>Dereva</button>
+    <button type="button" data-v="vDereva"><span>🚚</span>Dereva<i id="badgeDereva" style="display:none"></i></button>
     <button type="button" data-v="vMimi"><span>👤</span>Mimi</button>
   </nav>
   </div>
@@ -676,7 +707,14 @@ async function loadVehicles() {
     wa.setAttribute("aria-label", "WhatsApp");
     wa.className = "piga wa";
 
-    card.append(head); if (pic) card.append(pic); card.append(type, plate, capacity, location, call, wa);
+    card.append(head); if (pic) card.append(pic); card.append(type, plate, capacity, location);
+    if (item.user_id && item.user_id !== currentUserId) {
+      const ob = document.createElement("button");
+      ob.type = "button"; ob.className = "omba-btn"; ob.textContent = "📩 Omba gari hili";
+      ob.onclick = function () { ombaGari(item, ob); };
+      card.append(ob);
+    }
+    card.append(call, wa);
     card.dataset.aina = item.vehicle_type || "";
     card.dataset.eneo = item.location || "";
     vehiclesList.appendChild(card);
@@ -717,14 +755,61 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
     sel.add(new Option(i ? "Unapeleka wapi?" : "Unachukua wapi?", ""));
     MAENEO_DAR.forEach(function (m) { sel.add(new Option(m, m)); });
   });
+  const MZIGO = [["🌾","Vyakula"],["🧱","Vifaa vya ujenzi"],["🛋️","Samani"],["⛰️","Mchanga/kokoto"],["💡","Vifaa vya umeme"],["👕","Bidhaa za dukani"],["📦","Nyingine"]];
+  let mzigoChaguo = "";
+  const mWrap = document.getElementById("mAina");
+  function choraMzigo() {
+    mWrap.innerHTML = "";
+    MZIGO.forEach(function (m) {
+      const c = document.createElement("div");
+      c.className = "chip" + (mzigoChaguo === m[1] ? " on" : "");
+      c.textContent = m[0] + " " + m[1];
+      c.onclick = function () {
+        mzigoChaguo = m[1]; choraMzigo();
+        const n = m[1] === "Nyingine";
+        document.getElementById("mAinaNyingine").style.display = n ? "" : "none";
+      };
+      mWrap.appendChild(c);
+    });
+  }
+  choraMzigo();
+  try { document.getElementById("mSimu").value = localStorage.getItem("mzigo_simu") || ""; } catch (e) {}
+
+  /* Inarudisha maelezo ya ombi, au null (na kuonyesha kosa) */
+  window.somaOmbi = function () {
+    const f = document.getElementById("bFrom").value, t = document.getElementById("bTo").value;
+    const kiasi = document.getElementById("mKiasi").value.trim();
+    const simu = document.getElementById("mSimu").value.trim();
+    let aina = mzigoChaguo === "Nyingine" ? document.getElementById("mAinaNyingine").value.trim() : mzigoChaguo;
+    let k = "";
+    if (!f) k = "Chagua unachukua wapi";
+    else if (!t) k = "Chagua unapeleka wapi";
+    else if (!aina) k = "Chagua mzigo wako ni nini";
+    else if (!kiasi || !(parseFloat(kiasi) > 0)) k = "Andika kiasi cha mzigo";
+    else if (simu.replace(/\D/g, "").length < 9) k = "Andika namba yako ya simu";
+    if (k) { alert(k); return null; }
+    try { localStorage.setItem("mzigo_simu", simu); } catch (e) {}
+    return { from: f, to: t, cargo: aina, qty: kiasi + " " + document.getElementById("mKipimo").value, phone: simu,
+             kiasiNum: parseFloat(kiasi), kipimo: document.getElementById("mKipimo").value };
+  };
+
+  function pendekezo(o) {
+    let tani = null;
+    if (o.kipimo === "Tani") tani = o.kiasiNum; else if (o.kipimo === "Kg") tani = o.kiasiNum / 1000;
+    if (tani === null) return "";
+    return tani <= 1 ? "Pickup" : tani <= 4 ? "Canter" : tani <= 10 ? "Fuso" : "Lori kubwa";
+  }
+
   document.getElementById("bTafuta").onclick = function () {
+    const o = window.somaOmbi(); if (!o) return;
     document.getElementById("matokeo").style.display = "block";
-    const f = document.getElementById("bFrom").value;
     document.getElementById("chujaGari").value = chaguo;
-    document.getElementById("chujaEneo").value = (f && f !== MAENEO_DAR[0]) ? f : "";
+    document.getElementById("chujaEneo").value = (o.from !== MAENEO_DAR[0]) ? o.from : "";
     chujaMagari();
     const n = Array.from(document.querySelectorAll("#vehicles > *")).filter(function (k) { return k.style.display !== "none"; }).length;
-    document.getElementById("bIdadi").textContent = n ? ("Magari " + n + " yamepatikana ⬇️") : "Hakuna " + chaguo + " eneo hilo bado. Jaribu eneo jingine.";
+    const pd = pendekezo(o);
+    const dokezo = (pd && pd !== chaguo) ? " 💡 Kwa " + o.qty + " tunapendekeza " + pd + "." : "";
+    document.getElementById("bIdadi").textContent = (n ? ("Magari " + n + " yamepatikana ⬇️") : "Hakuna " + chaguo + " eneo hilo bado. Jaribu eneo jingine.") + dokezo;
     document.getElementById("vehicles").scrollIntoView({ behavior: "smooth" });
   };
 })();
@@ -843,10 +928,95 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
   }
   btns.forEach(function (b) { b.addEventListener("click", function () { nenda(b.dataset.v); }); });
   window.nendaSkrini = nenda;
-  document.getElementById("bTafuta").addEventListener("click", function () {
-    document.getElementById("matokeo").style.display = "block";
-  });
 })();
+
+/* ---------- MAOMBI YA MIZIGO ---------- */
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+
+async function ombaGari(item, btn) {
+  const o = window.somaOmbi();
+  if (!o) { window.nendaSkrini("vNyumbani"); return; }
+  if (!confirm("Tuma ombi kwa " + item.owner_name + " (" + item.vehicle_type + ")?\n\nMzigo: " + o.cargo + ", " + o.qty + "\n" + o.from + " → " + o.to)) return;
+  btn.disabled = true; btn.textContent = "Inatuma...";
+  const { error } = await supabaseClient.from("requests").insert([{
+    driver_id: item.user_id, driver_phone: item.phone, driver_name: item.owner_name,
+    plate: item.plate_number || "", vehicle_type: item.vehicle_type,
+    customer_phone: o.phone, from_place: o.from, to_place: o.to,
+    cargo_type: o.cargo, quantity: o.qty
+  }]);
+  btn.disabled = false; btn.textContent = "📩 Omba gari hili";
+  if (error) { alert("Ombi halijatumwa: " + error.message); return; }
+  alert("Ombi limetumwa! Subiri jibu la dereva.");
+  await pakiaMaombi();
+  window.nendaSkrini("vNyumbani");
+  const m = document.getElementById("maombiYangu"); if (m) m.scrollIntoView({ behavior: "smooth" });
+}
+
+async function badiliHali(id, hali) {
+  const { error } = await supabaseClient.from("requests").update({ status: hali }).eq("id", id);
+  if (error) alert("Imeshindikana: " + error.message);
+  pakiaMaombi();
+}
+
+function viungo(simu, ujumbe, kadi) {
+  const c = el("a", "piga", "📞 Piga simu: " + simu); c.href = "tel:" + simu;
+  const w = el("a", "piga wa"); w.href = waLink(simu, ujumbe); w.target = "_blank"; w.rel = "noopener";
+  w.innerHTML = WA_ICON; w.setAttribute("aria-label", "WhatsApp");
+  kadi.append(c, w);
+}
+
+async function pakiaMaombi() {
+  if (!currentUserId) return;
+  const { data, error } = await supabaseClient.from("requests").select("*").order("id", { ascending: false });
+  if (error || !data) { return; }
+  const mimi = document.getElementById("maombiYangu"), dr = document.getElementById("maombiDereva");
+  mimi.replaceChildren(); dr.replaceChildren();
+
+  const yangu = data.filter(function (r) { return r.customer_id === currentUserId; }).slice(0, 8);
+  if (yangu.length) mimi.append(el("h2", "", "Maombi yangu"));
+  yangu.forEach(function (r) {
+    const ok = r.status === "imekubaliwa", no = r.status === "imekataliwa" || r.status === "imeghairiwa";
+    const k = el("div", "ombi-kadi" + (ok ? " sawa" : no ? " kataa" : ""));
+    k.append(el("p", "j", "🚚 " + r.vehicle_type + " · " + (r.driver_name || "")));
+    k.append(el("p", "", "📦 " + r.cargo_type + ", " + r.quantity));
+    k.append(el("p", "", "📍 " + r.from_place + " → " + r.to_place));
+    k.append(el("span", "chip-hali" + (ok ? " sawa" : no ? " kataa" : ""),
+      ok ? "✔ Dereva amekubali" : r.status === "imekataliwa" ? "✖ Dereva hawezi, jaribu gari lingine" : r.status === "imeghairiwa" ? "Umeghairi" : "⏳ Inasubiri jibu la dereva"));
+    if (ok) viungo(r.driver_phone, "Habari, nimekuomba kupitia MzigoLink: " + r.cargo_type + ", " + r.quantity + ", " + r.from_place + " kwenda " + r.to_place + ".", k);
+    if (r.status === "inasubiri") {
+      const g = el("button", "kataa-b", "Ghairi ombi"); g.type = "button";
+      g.onclick = function () { if (confirm("Ghairi ombi hili?")) badiliHali(r.id, "imeghairiwa"); };
+      k.append(g);
+    }
+    mimi.append(k);
+  });
+
+  const kwangu = data.filter(function (r) { return r.driver_id === currentUserId && (r.status === "inasubiri" || r.status === "imekubaliwa"); });
+  const mapya = kwangu.filter(function (r) { return r.status === "inasubiri"; }).length;
+  const bd = document.getElementById("badgeDereva");
+  bd.style.display = mapya ? "" : "none"; bd.textContent = mapya;
+  if (kwangu.length) dr.append(el("h2", "", "📩 Maombi ya mizigo"));
+  kwangu.forEach(function (r) {
+    const ok = r.status === "imekubaliwa";
+    const k = el("div", "ombi-kadi" + (ok ? " sawa" : ""));
+    k.append(el("p", "j", "📦 " + r.cargo_type + ", " + r.quantity));
+    k.append(el("p", "", "📍 " + r.from_place + " → " + r.to_place));
+    k.append(el("p", "", "🚚 Gari: " + r.vehicle_type + " " + (r.plate || "")));
+    if (ok) {
+      k.append(el("span", "chip-hali sawa", "✔ Umekubali"));
+      viungo(r.customer_phone, "Habari, nimekubali ombi lako la mzigo (" + r.cargo_type + ", " + r.quantity + ") kupitia MzigoLink. Tuonane wapi?", k);
+    } else {
+      const v = el("div", "vitufe");
+      const a = el("button", "", "✔ Nakubali"); a.type = "button";
+      a.onclick = function () { badiliHali(r.id, "imekubaliwa"); };
+      const b = el("button", "kataa-b", "✖ Nakataa"); b.type = "button";
+      b.onclick = function () { if (confirm("Kataa ombi hili?")) badiliHali(r.id, "imekataliwa"); };
+      v.append(a, b); k.append(v);
+    }
+    dr.append(k);
+  });
+}
+setInterval(function () { if (currentUserId && document.visibilityState === "visible") pakiaMaombi(); }, 20000);
 
 loadVehicles();
 
@@ -1020,6 +1190,7 @@ function onyeshaHali(session) {
     document.getElementById("userEmail").textContent = session.user.email;
   }
   pakia();
+  if (ndani) pakiaMaombi();
 }
 
 document.getElementById("authForm").addEventListener("submit", async function (e) {
