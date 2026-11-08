@@ -6,6 +6,7 @@
   <title>MzigoLink</title>
   <meta name="theme-color" content="#16a34a">
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -191,6 +192,13 @@ body{padding-bottom:90px}
 .omba-btn{background:#ea580c}
 .nav-chini button{position:relative}
 .nav-chini button i{position:absolute;top:0;left:55%;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-style:normal;min-width:18px;height:18px;line-height:18px;padding:0 5px}
+.ramani{height:230px;border-radius:14px;margin-top:10px;overflow:hidden;z-index:0}
+.pin-emoji{font-size:26px;line-height:30px;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.eneo-btn{background:#fff;color:#166534;border:2px solid #16a34a;margin-top:0;padding:10px;font-size:14px}
+.eneo-btn.ok{background:#f0fdf4}
+.umbali-mstari{margin-top:10px;background:#f0fdf4;border-radius:12px;padding:10px 12px;font-weight:700;color:#14532d}
+.umbali-mstari.kimya{background:#f1f5f9;color:#475569;font-weight:600}
+.dokezo-gps{font-size:12px;color:#64748b;margin:6px 0 0}
   </style>
 </head>
 <body>
@@ -223,6 +231,8 @@ body{padding-bottom:90px}
       <div class="mstari"><span class="nukta"></span><select id="bFrom"></select></div>
       <div class="mstari"><span class="mraba"></span><select id="bTo"></select></div>
     </div>
+    <button type="button" id="bEneoLangu" class="eneo-btn">📍 Tumia eneo langu kama mzigo ulipo (si lazima)</button>
+    <div style="height:12px"></div>
     <div id="bGari"></div>
     <div class="mzigo-box">
       <label>Mzigo wako ni nini?</label>
@@ -430,6 +440,7 @@ body{padding-bottom:90px}
   </nav>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
 const SUPABASE_URL = "https://expxsxfdgbjortbuyeaw.supabase.co";
@@ -789,7 +800,8 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
     else if (simu.replace(/\D/g, "").length < 9) k = "Andika namba yako ya simu";
     if (k) { alert(k); return null; }
     try { localStorage.setItem("mzigo_simu", simu); } catch (e) {}
-    return { from: f, to: t, cargo: aina, qty: kiasi + " " + document.getElementById("mKipimo").value, phone: simu,
+    const pk = window.eneoLangu || koordEneo(f);
+    return { from: f, to: t, cargo: aina, qty: kiasi + " " + document.getElementById("mKipimo").value, phone: simu, pickup: pk,
              kiasiNum: parseFloat(kiasi), kipimo: document.getElementById("mKipimo").value };
   };
 
@@ -930,6 +942,71 @@ document.getElementById("chujaEneo").addEventListener("change", chujaMagari);
   window.nendaSkrini = nenda;
 })();
 
+/* ---------- ENEO NA RAMANI ---------- */
+const KOORD = {
+  "Dar es Salaam (popote)":[-6.80,39.25],"Posta":[-6.816,39.290],"Kariakoo":[-6.8185,39.2725],"Kivukoni":[-6.819,39.293],
+  "Kurasini":[-6.840,39.290],"Kigamboni":[-6.870,39.330],"Temeke":[-6.860,39.265],"Tandika":[-6.872,39.260],
+  "Mbagala":[-6.900,39.270],"Buguruni":[-6.835,39.250],"Ilala":[-6.833,39.240],"Gongo la Mboto":[-6.887,39.165],
+  "Ukonga":[-6.878,39.200],"Chanika":[-6.950,39.100],"Segerea":[-6.830,39.180],"Tabata":[-6.830,39.215],
+  "Manzese":[-6.790,39.240],"Ubungo":[-6.790,39.220],"Sinza":[-6.780,39.230],"Magomeni":[-6.807,39.260],
+  "Kimara":[-6.780,39.170],"Mbezi Luis":[-6.725,39.145],"Mbezi Beach":[-6.720,39.215],"Mwenge":[-6.770,39.240],
+  "Mikocheni":[-6.765,39.255],"Mwananyamala":[-6.790,39.260],"Kinondoni":[-6.780,39.270],"Kawe":[-6.730,39.220],
+  "Tegeta":[-6.670,39.170],"Bunju":[-6.620,39.150],"Kibaha":[-6.770,38.920],"Bagamoyo":[-6.440,38.900],"Kisarawe":[-6.910,39.060]
+};
+function koordEneo(jina) { return KOORD[jina] || KOORD["Dar es Salaam (popote)"]; }
+function kmMstari(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * rad, dLng = (b[1] - a[1]) * rad;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * rad) * Math.cos(b[0] * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+function maelezoUmbali(a, b) {
+  const km = kmMstari(a, b) * 1.3;               /* makadirio ya barabara */
+  const dk = Math.max(1, Math.round(km * 2.4));  /* ~25 km/h mjini Dar */
+  return "km " + (km < 10 ? km.toFixed(1) : Math.round(km)) + " · takriban dakika " + dk;
+}
+function jaribuKuhifadhi() {}
+
+(function () {
+  const b = document.getElementById("bEneoLangu");
+  window.eneoLangu = null;
+  b.addEventListener("click", function () {
+    if (!navigator.geolocation) { alert("Simu yako haiungi mkono eneo"); return; }
+    b.textContent = "Inatafuta eneo lako...";
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      window.eneoLangu = [pos.coords.latitude, pos.coords.longitude];
+      b.textContent = "✔ Eneo lako limechukuliwa"; b.classList.add("ok");
+    }, function () {
+      window.eneoLangu = null; b.classList.remove("ok");
+      b.textContent = "📍 Tumia eneo langu kama mzigo ulipo (si lazima)";
+      alert("Eneo halijapatikana. Ruhusu eneo kwenye Settings ya Safari, au tumia eneo ulilochagua.");
+    }, { enableHighAccuracy: true, timeout: 15000 });
+  });
+})();
+
+/* Ramani moja kwa kila ombi */
+const ramaniZote = {};
+function ramaniIkoni(emoji) { return L.divIcon({ html: '<div class="pin-emoji">' + emoji + '</div>', className: "", iconSize: [30, 30], iconAnchor: [15, 15] }); }
+function jengaRamani(div, id, pick, dest) {
+  if (typeof L === "undefined") return null;
+  try {
+    const m = L.map(div, { zoomControl: true, attributionControl: true }).setView(pick, 13);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(m);
+    L.marker(pick, { icon: ramaniIkoni("📍") }).addTo(m);
+    if (dest) L.marker(dest, { icon: ramaniIkoni("🏁") }).addTo(m);
+    const gari = L.marker(pick, { icon: ramaniIkoni("🚚") });
+    const o = { map: m, gari: gari, pick: pick, dest: dest, onyeshwa: false };
+    ramaniZote[id] = o;
+    setTimeout(function () { m.invalidateSize(); }, 200);
+    return o;
+  } catch (e) { return null; }
+}
+function wekaGari(id, ll) {
+  const o = ramaniZote[id]; if (!o) return;
+  o.gari.setLatLng(ll);
+  if (!o.onyeshwa) { o.gari.addTo(o.map); o.onyeshwa = true; o.map.fitBounds([o.pick, ll].concat(o.dest ? [o.dest] : []), { padding: [30, 30] }); }
+}
+
 /* ---------- MAOMBI YA MIZIGO ---------- */
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
 
@@ -942,7 +1019,8 @@ async function ombaGari(item, btn) {
     driver_id: item.user_id, driver_phone: item.phone, driver_name: item.owner_name,
     plate: item.plate_number || "", vehicle_type: item.vehicle_type,
     customer_phone: o.phone, from_place: o.from, to_place: o.to,
-    cargo_type: o.cargo, quantity: o.qty
+    cargo_type: o.cargo, quantity: o.qty,
+    pickup_lat: o.pickup ? o.pickup[0] : null, pickup_lng: o.pickup ? o.pickup[1] : null
   }]);
   btn.disabled = false; btn.textContent = "📩 Omba gari hili";
   if (error) { alert("Ombi halijatumwa: " + error.message); return; }
@@ -965,12 +1043,50 @@ function viungo(simu, ujumbe, kadi) {
   kadi.append(c, w);
 }
 
-async function pakiaMaombi() {
+let sahihiMwisho = "";
+let ombiZangu = [];            /* maombi yaliyokubaliwa ya mteja (kwa ufuatiliaji) */
+const shiriki = { id: null, watchId: null, lastSent: 0, wake: null };
+
+async function anzaKushiriki(r) {
+  if (!navigator.geolocation) { alert("Simu yako haiungi mkono eneo"); return; }
+  if (shiriki.id) await achaKushiriki(true);
+  shiriki.id = r.id; shiriki.lastSent = 0;
+  try { if (navigator.wakeLock) shiriki.wake = await navigator.wakeLock.request("screen"); } catch (e) {}
+  shiriki.watchId = navigator.geolocation.watchPosition(async function (pos) {
+    const ll = [pos.coords.latitude, pos.coords.longitude];
+    const d = document.getElementById("dist-" + r.id);
+    if (d) d.textContent = "Umbali hadi mteja: " + maelezoUmbali(ll, r.pickup_lat != null ? [r.pickup_lat, r.pickup_lng] : koordEneo(r.from_place));
+    const now = Date.now();
+    if (now - shiriki.lastSent < 4000) return;
+    shiriki.lastSent = now;
+    await supabaseClient.from("request_locations").upsert({ request_id: r.id, lat: ll[0], lng: ll[1], updated_at: new Date().toISOString() }, { onConflict: "request_id" });
+  }, function () {
+    alert("Eneo halijapatikana. Ruhusu eneo kwenye Settings ya Safari, kisha jaribu tena.");
+    achaKushiriki(false);
+  }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
+  pakiaMaombi(true);
+}
+async function achaKushiriki(kimya) {
+  const id = shiriki.id;
+  if (shiriki.watchId !== null) navigator.geolocation.clearWatch(shiriki.watchId);
+  try { if (shiriki.wake) await shiriki.wake.release(); } catch (e) {}
+  shiriki.id = null; shiriki.watchId = null; shiriki.wake = null;
+  if (id) await supabaseClient.from("request_locations").delete().eq("request_id", id);
+  if (!kimya) pakiaMaombi(true);
+}
+
+async function pakiaMaombi(lazimisha) {
   if (!currentUserId) return;
   const { data, error } = await supabaseClient.from("requests").select("*").order("id", { ascending: false });
   if (error || !data) { return; }
+  const sahihi = JSON.stringify(data) + "|" + shiriki.id;
+  if (!lazimisha && sahihi === sahihiMwisho) return;
+  sahihiMwisho = sahihi;
+
   const mimi = document.getElementById("maombiYangu"), dr = document.getElementById("maombiDereva");
   mimi.replaceChildren(); dr.replaceChildren();
+  Object.keys(ramaniZote).forEach(function (k) { try { ramaniZote[k].map.remove(); } catch (e) {} delete ramaniZote[k]; });
+  ombiZangu = [];
 
   const yangu = data.filter(function (r) { return r.customer_id === currentUserId; }).slice(0, 8);
   if (yangu.length) mimi.append(el("h2", "", "Maombi yangu"));
@@ -982,7 +1098,12 @@ async function pakiaMaombi() {
     k.append(el("p", "", "📍 " + r.from_place + " → " + r.to_place));
     k.append(el("span", "chip-hali" + (ok ? " sawa" : no ? " kataa" : ""),
       ok ? "✔ Dereva amekubali" : r.status === "imekataliwa" ? "✖ Dereva hawezi, jaribu gari lingine" : r.status === "imeghairiwa" ? "Umeghairi" : "⏳ Inasubiri jibu la dereva"));
-    if (ok) viungo(r.driver_phone, "Habari, nimekuomba kupitia MzigoLink: " + r.cargo_type + ", " + r.quantity + ", " + r.from_place + " kwenda " + r.to_place + ".", k);
+    if (ok) {
+      const u = el("div", "umbali-mstari kimya", "Dereva bado hajaanza safari"); u.id = "u-" + r.id; k.append(u);
+      const rm = el("div", "ramani"); rm.id = "rm-" + r.id; k.append(rm);
+      viungo(r.driver_phone, "Habari, nimekuomba kupitia MzigoLink: " + r.cargo_type + ", " + r.quantity + ", " + r.from_place + " kwenda " + r.to_place + ".", k);
+      ombiZangu.push(r);
+    }
     if (r.status === "inasubiri") {
       const g = el("button", "kataa-b", "Ghairi ombi"); g.type = "button";
       g.onclick = function () { if (confirm("Ghairi ombi hili?")) badiliHali(r.id, "imeghairiwa"); };
@@ -1005,6 +1126,22 @@ async function pakiaMaombi() {
     if (ok) {
       k.append(el("span", "chip-hali sawa", "✔ Umekubali"));
       viungo(r.customer_phone, "Habari, nimekubali ombi lako la mzigo (" + r.cargo_type + ", " + r.quantity + ") kupitia MzigoLink. Tuonane wapi?", k);
+      const pk = r.pickup_lat != null ? [r.pickup_lat, r.pickup_lng] : koordEneo(r.from_place);
+      const nav = el("a", "piga", "🧭 Fungua njia (Google Maps)");
+      nav.href = "https://www.google.com/maps/dir/?api=1&destination=" + pk[0] + "," + pk[1]; nav.target = "_blank"; nav.rel = "noopener";
+      k.append(nav);
+      if (shiriki.id === r.id) {
+        const u = el("div", "umbali-mstari", "📡 Unashiriki eneo lako na mteja"); k.append(u);
+        const d = el("p", "dokezo-gps", "Inapata eneo..."); d.id = "dist-" + r.id; k.append(d);
+        k.append(el("p", "dokezo-gps", "Acha app wazi na skrini ikiwaka ili mteja akuone."));
+        const st = el("button", "kataa-b", "⏹ Acha kushiriki eneo"); st.type = "button";
+        st.onclick = function () { achaKushiriki(false); };
+        k.append(st);
+      } else {
+        const st = el("button", "", "📡 Anza safari (shiriki eneo)"); st.type = "button";
+        st.onclick = function () { anzaKushiriki(r); };
+        k.append(st);
+      }
     } else {
       const v = el("div", "vitufe");
       const a = el("button", "", "✔ Nakubali"); a.type = "button";
@@ -1015,8 +1152,37 @@ async function pakiaMaombi() {
     }
     dr.append(k);
   });
+
+  /* ramani za mteja */
+  ombiZangu.forEach(function (r) {
+    const div = document.getElementById("rm-" + r.id);
+    const pick = r.pickup_lat != null ? [r.pickup_lat, r.pickup_lng] : koordEneo(r.from_place);
+    const o = jengaRamani(div, r.id, pick, koordEneo(r.to_place));
+    if (!o) div.style.display = "none";
+  });
+  pakiaEneo();
 }
+
+async function pakiaEneo() {
+  if (!currentUserId || !ombiZangu.length) return;
+  const ids = ombiZangu.map(function (r) { return r.id; });
+  const { data, error } = await supabaseClient.from("request_locations").select("*").in("request_id", ids);
+  if (error || !data) return;
+  ombiZangu.forEach(function (r) {
+    const u = document.getElementById("u-" + r.id); if (!u) return;
+    const e = data.find(function (x) { return x.request_id === r.id; });
+    if (!e) { u.className = "umbali-mstari kimya"; u.textContent = "Dereva bado hajaanza safari"; return; }
+    const ll = [e.lat, e.lng];
+    const pick = r.pickup_lat != null ? [r.pickup_lat, r.pickup_lng] : koordEneo(r.from_place);
+    const umri = Math.round((Date.now() - new Date(e.updated_at).getTime()) / 60000);
+    u.className = "umbali-mstari";
+    u.textContent = "🚚 Gari liko " + maelezoUmbali(ll, pick) + (umri >= 2 ? " (eneo la dakika " + umri + " zilizopita)" : "");
+    wekaGari(r.id, ll);
+  });
+}
+
 setInterval(function () { if (currentUserId && document.visibilityState === "visible") pakiaMaombi(); }, 20000);
+setInterval(function () { if (currentUserId && document.visibilityState === "visible") pakiaEneo(); }, 5000);
 
 loadVehicles();
 
